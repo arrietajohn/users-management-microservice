@@ -25,8 +25,9 @@ services:
         value: REQUIRED
       - key: SMTP_HOST
         value: smtp.gmail.com
+      # Render bloquea el 587 saliente; el 465 usa TLS implicito sobre el mismo puerto abierto.
       - key: SMTP_PORT
-        value: "587"
+        value: "465"
       - key: SMTP_USERNAME
         sync: false
       - key: SMTP_PASSWORD

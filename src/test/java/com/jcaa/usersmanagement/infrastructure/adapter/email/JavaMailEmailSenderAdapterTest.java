@@ -7,6 +7,7 @@ import static org.mockito.Mockito.mockStatic;
 import com.jcaa.usersmanagement.domain.exception.EmailSenderException;
 import com.jcaa.usersmanagement.domain.model.EmailDestinationModel;
 import java.lang.reflect.Field;
+import java.util.Properties;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -29,6 +30,7 @@ class JavaMailEmailSenderAdapterTest {
 
   private static final String HOST = "smtp.example.com";
   private static final int PORT = 587;
+  private static final int IMPLICIT_TLS_PORT = 465;
   private static final String USERNAME = "user@example.com";
   private static final String PASSWORD = "secret";
   private static final String FROM_ADDRESS = "noreply@example.com";
@@ -109,5 +111,44 @@ class JavaMailEmailSenderAdapterTest {
         "credentials must match SmtpConfig",
         () -> assertEquals(USERNAME, auth.getUserName()),
         () -> assertEquals(PASSWORD, auth.getPassword()));
+  }
+
+  // ── TLS — puerto 465 usa TLS implicito en lugar de STARTTLS
+
+  @Test
+  @SuppressWarnings("java:S3011") // reflection required to access private mailSession in test scope
+  @DisplayName("Puerto 465 habilita SSL implicito y desactiva STARTTLS")
+  void shouldEnableImplicitTlsForPort465() throws Exception {
+    // Arrange — el adaptador se construye con el puerto 465
+    final JavaMailEmailSenderAdapter sslAdapter =
+        new JavaMailEmailSenderAdapter(
+            new SmtpConfig(HOST, IMPLICIT_TLS_PORT, USERNAME, PASSWORD, FROM_ADDRESS, FROM_NAME));
+    final Field sessionField = JavaMailEmailSenderAdapter.class.getDeclaredField("mailSession");
+    sessionField.setAccessible(true);
+    final Properties properties = ((Session) sessionField.get(sslAdapter)).getProperties();
+
+    // Act + Assert
+    assertAll(
+        "implicit TLS properties",
+        () -> assertEquals("true", properties.get("mail.smtp.ssl.enable")),
+        () -> assertEquals("false", properties.get("mail.smtp.starttls.enable")),
+        () -> assertEquals(HOST, properties.get("mail.smtp.ssl.trust")),
+        () -> assertEquals(String.valueOf(IMPLICIT_TLS_PORT), properties.get("mail.smtp.port")));
+  }
+
+  @Test
+  @SuppressWarnings("java:S3011") // reflection required to access private mailSession in test scope
+  @DisplayName("Puerto distinto de 465 mantiene STARTTLS y no habilita SSL implicito")
+  void shouldKeepStartTlsForOtherPorts() throws Exception {
+    // Arrange — el adaptador bajo prueba usa PORT (587)
+    final Field sessionField = JavaMailEmailSenderAdapter.class.getDeclaredField("mailSession");
+    sessionField.setAccessible(true);
+    final Properties properties = ((Session) sessionField.get(adapter)).getProperties();
+
+    // Act + Assert
+    assertAll(
+        "STARTTLS properties",
+        () -> assertEquals("true", properties.get("mail.smtp.starttls.enable")),
+        () -> assertNull(properties.get("mail.smtp.ssl.enable")));
   }
 }

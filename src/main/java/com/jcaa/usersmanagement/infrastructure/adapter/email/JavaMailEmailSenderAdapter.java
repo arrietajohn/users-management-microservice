@@ -25,9 +25,19 @@ public class JavaMailEmailSenderAdapter implements EmailSenderPort {
   private static final String MAIL_SMTP_PORT = "mail.smtp.port";
   private static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
   private static final String MAIL_SMTP_STARTTLS = "mail.smtp.starttls.enable";
+  private static final String MAIL_SMTP_SSL_ENABLE = "mail.smtp.ssl.enable";
+  private static final String MAIL_SMTP_SSL_TRUST = "mail.smtp.ssl.trust";
   private static final String CONTENT_TYPE_HTML = "text/html; charset=UTF-8";
   private static final String CHARSET_UTF8 = "UTF-8";
   private static final String LOG_SENT = "[JavaMailEmailSenderAdapter] correo enviado exitosamente.";
+
+  /**
+   * Puerto de SMTP sobre TLS implicito (SMTPS). A diferencia del 587, aqui la negociacion del
+   * cifrado ocurre dentro del propio canal TCP: no se usa STARTTLS.
+   *
+   * <p>Es relevante porque el hosting puede bloquear el 587 saliente y dejar abierto el 465.
+   */
+  private static final int IMPLICIT_TLS_PORT = 465;
 
   private final Session mailSession;
   private final String fromAddress;
@@ -81,7 +91,14 @@ public class JavaMailEmailSenderAdapter implements EmailSenderPort {
     properties.put(MAIL_SMTP_HOST, config.host());
     properties.put(MAIL_SMTP_PORT, String.valueOf(config.port()));
     properties.put(MAIL_SMTP_AUTH, "true");
-    properties.put(MAIL_SMTP_STARTTLS, "true");
+    if (config.port() == IMPLICIT_TLS_PORT) {
+      // TLS implicito: el cifrado se negocia al abrir el socket, sin comando STARTTLS.
+      properties.put(MAIL_SMTP_STARTTLS, "false");
+      properties.put(MAIL_SMTP_SSL_ENABLE, "true");
+      properties.put(MAIL_SMTP_SSL_TRUST, config.host());
+    } else {
+      properties.put(MAIL_SMTP_STARTTLS, "true");
+    }
     return properties;
   }
 }
