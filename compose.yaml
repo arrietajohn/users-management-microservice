@@ -52,6 +52,7 @@ services:
     image: users-management-api:local
     environment:
       PORT: "8080"
+      DB_VENDOR: ${DB_VENDOR:-mysql}
       DB_HOST: ${DB_HOST:-mysql}
       DB_PORT: ${DB_PORT:-3306}
       DB_NAME: crud_usuarios
