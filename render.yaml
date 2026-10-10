@@ -7,16 +7,20 @@ services:
     autoDeployTrigger: commit
     healthCheckPath: /v3/api-docs
     envVars:
+      # Motor de base de datos. Cambiar a "mysql" para desplegar sobre MySQL.
+      - key: DB_VENDOR
+        value: postgresql
       - key: DB_HOST
         sync: false
       - key: DB_PORT
         sync: false
       - key: DB_NAME
-        value: crud_usuarios
+        value: postgres
       - key: DB_USERNAME
         sync: false
       - key: DB_PASSWORD
         sync: false
+      # PostgreSQL exige SSL en Supabase; el valor se traduce a sslmode=require.
       - key: DB_SSL_MODE
         value: REQUIRED
       - key: SMTP_HOST

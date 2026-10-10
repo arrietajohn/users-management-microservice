@@ -15,6 +15,7 @@ import com.jcaa.usersmanagement.infrastructure.adapter.persistence.exception.Per
 import com.jcaa.usersmanagement.infrastructure.adapter.persistence.mapper.UserPersistenceMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -25,8 +26,16 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Adaptador de persistencia para MySQL. Es el adaptador por defecto: se registra salvo que
+ * {@code db.vendor} indique explícitamente {@code postgresql}.
+ */
 @Slf4j
 @Repository
+@ConditionalOnProperty(
+    name = "db.vendor",
+    havingValue = "mysql",
+    matchIfMissing = true)
 @RequiredArgsConstructor
 public class UserRepositoryMySQL
     implements SaveUserPort,
