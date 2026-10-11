@@ -7,7 +7,7 @@ services:
       MYSQL_PASSWORD: local_users_password
       MYSQL_ROOT_PASSWORD: local_root_password
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
@@ -34,12 +34,9 @@ services:
       DB_USERNAME: users_app
       DB_PASSWORD: local_users_password
       DB_SSL_MODE: DISABLED
-      SMTP_HOST: smtp.gmail.com
-      SMTP_PORT: "587"
-      SMTP_USERNAME: ${SMTP_USERNAME:-}
-      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
-      SMTP_FROM_ADDRESS: ${SMTP_FROM_ADDRESS:-}
-      SMTP_FROM_NAME: ${SMTP_FROM_NAME:-Gestion de Usuarios}
+      BREVO_API_KEY: ${BREVO_API_KEY:?Defina BREVO_API_KEY en el archivo .env local}
+      BREVO_FROM_ADDRESS: ${BREVO_FROM_ADDRESS:?Defina BREVO_FROM_ADDRESS en el archivo .env local}
+      BREVO_FROM_NAME: ${BREVO_FROM_NAME:-Gestion de Usuarios}
       JWT_SECRET: ${JWT_SECRET:-ZGV2ZWxvcG1lbnQtb25seS1qd3Qtc2VjcmV0LW11c3QtYmUtcmVwbGFjZWQ=}
       JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS:-900}
     ports:
