@@ -78,5 +78,6 @@ java -jar target/users-management-2.0.0-SNAPSHOT.jar
 
 - **Database:** MySQL via raw JDBC (`spring-boot-starter-jdbc` provides `HikariCP`). Schema in `src/main/resources/schema.sql`. Config keys: `db.host`, `db.port`, `db.name`, `db.username`, `db.password`.  
 - **Email:** SMTP via `javax.mail` (legacy `com.sun.mail:javax.mail:1.6.2`). **Not** migrated to `jakarta.mail`. Config keys: `smtp.host`, `smtp.port`, `smtp.username`, `smtp.password`, `smtp.from.address`, `smtp.from.name`.  
+- **REST security (JWT):** Spring Security + OAuth2 Resource Server (Nimbus, HS256). `POST /api/auth/login` returns the token; `GET /api/users/**` needs any authenticated user, `POST/PUT/DELETE /api/users/**` need role `ADMIN`. Rules in `infrastructure/config/SecuritySpringConfig`, token issuing in `infrastructure/security/JwtTokenProvider`. Config keys: `jwt.secret` (≥ 32 bytes, override with env var `JWT_SECRET`), `jwt.issuer`, `jwt.expiration-minutes`.  
 - **Password hashing:** `at.favre.lib:bcrypt` — cost factor 12. Always use `UserPassword.fromPlainText()` for new passwords and `UserPassword.fromHash()` when reading from DB.
 

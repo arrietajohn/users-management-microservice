@@ -1,5 +1,6 @@
 package com.jcaa.usersmanagement.infrastructure.entrypoint.rest.controller;
 
+import com.jcaa.usersmanagement.infrastructure.config.OpenApiSpringConfig;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.CreateUserRestRequest;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.UpdateUserRestRequest;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.response.ApiErrorResponse;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -22,8 +24,12 @@ import org.springframework.web.bind.annotation.RequestBody;
  *
  * <p>Toda la documentación de la API (anotaciones {@code @Operation}, {@code @ApiResponses}, etc.)
  * vive aquí para mantener el controlador limpio y enfocado únicamente en la lógica de despacho.
+ *
+ * <p>Todas las operaciones requieren un JWT válido (obtenido en {@code POST /api/auth/login}).
+ * Crear, actualizar y eliminar requieren además el rol {@code ADMIN}.
  */
 @Tag(name = "Users", description = "Gestión de usuarios: crear, consultar, actualizar y eliminar.")
+@SecurityRequirement(name = OpenApiSpringConfig.BEARER_AUTH_SCHEME)
 public interface UserRestControllerDocs {
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -35,7 +41,8 @@ public interface UserRestControllerDocs {
       description =
           "Registra un nuevo usuario en el sistema. "
               + "El ID debe ser único y el correo no puede estar en uso. "
-              + "Se enviará un correo de bienvenida con las credenciales al registrarlo.")
+              + "Se enviará un correo de bienvenida con las credenciales al registrarlo. "
+              + "Requiere rol ADMIN.")
   @ApiResponses({
     @ApiResponse(
         responseCode = "201",
@@ -47,6 +54,20 @@ public interface UserRestControllerDocs {
     @ApiResponse(
         responseCode = "400",
         description = "Datos de entrada inválidos (campos requeridos vacíos o formato incorrecto).",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class))),
+    @ApiResponse(
+        responseCode = "401",
+        description = "Falta el token de acceso o no es válido.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class))),
+    @ApiResponse(
+        responseCode = "403",
+        description = "El usuario autenticado no tiene rol ADMIN.",
         content =
             @Content(
                 mediaType = "application/json",
@@ -84,6 +105,13 @@ public interface UserRestControllerDocs {
                 mediaType = "application/json",
                 array = @ArraySchema(schema = @Schema(implementation = UserRestResponse.class)))),
     @ApiResponse(
+        responseCode = "401",
+        description = "Falta el token de acceso o no es válido.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class))),
+    @ApiResponse(
         responseCode = "500",
         description = "Error interno del servidor.",
         content =
@@ -108,6 +136,13 @@ public interface UserRestControllerDocs {
             @Content(
                 mediaType = "application/json",
                 schema = @Schema(implementation = UserRestResponse.class))),
+    @ApiResponse(
+        responseCode = "401",
+        description = "Falta el token de acceso o no es válido.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class))),
     @ApiResponse(
         responseCode = "404",
         description = "No existe ningún usuario con el ID proporcionado.",
@@ -137,7 +172,8 @@ public interface UserRestControllerDocs {
       description =
           "Actualiza los datos de un usuario existente. "
               + "Si se cambia el correo, este no debe estar en uso por otro usuario. "
-              + "Se enviará un correo de notificación de actualización.")
+              + "Se enviará un correo de notificación de actualización. "
+              + "Requiere rol ADMIN.")
   @ApiResponses({
     @ApiResponse(
         responseCode = "200",
@@ -149,6 +185,20 @@ public interface UserRestControllerDocs {
     @ApiResponse(
         responseCode = "400",
         description = "Datos de entrada inválidos.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class))),
+    @ApiResponse(
+        responseCode = "401",
+        description = "Falta el token de acceso o no es válido.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class))),
+    @ApiResponse(
+        responseCode = "403",
+        description = "El usuario autenticado no tiene rol ADMIN.",
         content =
             @Content(
                 mediaType = "application/json",
@@ -187,9 +237,24 @@ public interface UserRestControllerDocs {
 
   @Operation(
       summary = "Eliminar usuario",
-      description = "Elimina permanentemente un usuario del sistema por su ID.")
+      description =
+          "Elimina permanentemente un usuario del sistema por su ID. Requiere rol ADMIN.")
   @ApiResponses({
     @ApiResponse(responseCode = "204", description = "Usuario eliminado exitosamente."),
+    @ApiResponse(
+        responseCode = "401",
+        description = "Falta el token de acceso o no es válido.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class))),
+    @ApiResponse(
+        responseCode = "403",
+        description = "El usuario autenticado no tiene rol ADMIN.",
+        content =
+            @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ApiErrorResponse.class))),
     @ApiResponse(
         responseCode = "404",
         description = "No existe ningún usuario con el ID proporcionado.",
