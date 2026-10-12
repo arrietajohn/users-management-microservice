@@ -12,6 +12,8 @@ import com.jcaa.usersmanagement.application.service.dto.command.UpdateUserComman
 import com.jcaa.usersmanagement.application.service.dto.command.LoginCommand;
 import com.jcaa.usersmanagement.application.service.dto.query.GetUserByIdQuery;
 import com.jcaa.usersmanagement.domain.model.UserModel;
+import com.jcaa.usersmanagement.domain.enums.UserRole;
+import com.jcaa.usersmanagement.infrastructure.cache.CacheConfig;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.CreateUserRestRequest;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.UpdateUserRestRequest;
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.request.LoginRestRequest;
@@ -19,7 +21,12 @@ import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.dto.response.User
 import com.jcaa.usersmanagement.infrastructure.entrypoint.rest.mapper.UserRestMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,53 +44,92 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserRestController implements UserRestControllerDocs {
 
-  private final CreateUserUseCase createUserUseCase;
-  private final UpdateUserUseCase updateUserUseCase;
-  private final DeleteUserUseCase deleteUserUseCase;
-  private final GetUserByIdUseCase getUserByIdUseCase;
-  private final GetAllUsersUseCase getAllUsersUseCase;
-  private final LoginUseCase loginUseCase;
+    private final CreateUserUseCase createUserUseCase;
+    private final UpdateUserUseCase updateUserUseCase;
+    private final DeleteUserUseCase deleteUserUseCase;
+    private final GetUserByIdUseCase getUserByIdUseCase;
+    private final GetAllUsersUseCase getAllUsersUseCase;
+    private final LoginUseCase loginUseCase;
 
-  @PostMapping("/login")
-  public UserRestResponse login(@Valid @RequestBody final LoginRestRequest request) {
-    final UserModel user = loginUseCase.execute(new LoginCommand(request.email(), request.password()));
-    return UserRestMapper.toResponse(user);
-  }
+    // Login: NO se cachea.
+    @PostMapping("/login")
+    public UserRestResponse login(@Valid @RequestBody final LoginRestRequest request) {
+        final UserModel user = loginUseCase.execute(new LoginCommand(request.email(), request.password()));
+        return UserRestMapper.toResponse(user);
+    }
 
-  @PostMapping
-  @ResponseStatus(HttpStatus.CREATED)
-  public UserRestResponse create(@Valid @RequestBody final CreateUserRestRequest request) {
-    final CreateUserCommand command = UserRestMapper.toCreateCommand(request);
-    final UserModel user = createUserUseCase.execute(command);
-    return UserRestMapper.toResponse(user);
-  }
+    // Invalida la lista después de crear (solo si la creación termina sin error).
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    @CacheEvict(cacheNames = CacheConfig.USERS_LIST, key = "'all'")
+    public UserRestResponse create(
+            @Valid @RequestBody final CreateUserRestRequest request,
+            final Authentication authentication) {
+        final String assignedRole = resolveAssignedRole(request.role(), authentication);
+        final CreateUserCommand command = UserRestMapper.toCreateCommand(request, assignedRole);
+        final UserModel user = createUserUseCase.execute(command);
+        return UserRestMapper.toResponse(user);
+    }
 
-  @GetMapping
-  public List<UserRestResponse> getAll() {
-    return UserRestMapper.toResponseList(getAllUsersUseCase.execute());
-  }
+    private static boolean isAdministrator(final Authentication authentication) {
+        return authentication != null
+                && authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch("ROLE_ADMIN"::equals);
+    }
 
-  @GetMapping("/{id}")
-  public UserRestResponse getById(@PathVariable final String id) {
-    final GetUserByIdQuery query = UserRestMapper.toGetByIdQuery(id);
-    final UserModel user = getUserByIdUseCase.execute(query);
-    return UserRestMapper.toResponse(user);
-  }
+    private static String resolveAssignedRole(
+            final String requestedRole, final Authentication authentication) {
+        if (isAdministrator(authentication) && requestedRole != null && !requestedRole.isBlank()) {
+            return requestedRole;
+        }
+        return UserRole.MEMBER.name();
+    }
 
-  @PutMapping("/{id}")
-  public UserRestResponse update(
-      @PathVariable final String id,
-      @Valid @RequestBody final UpdateUserRestRequest request) {
-    final UpdateUserCommand command = UserRestMapper.toUpdateCommand(id, request);
-    final UserModel user = updateUserUseCase.execute(command);
-    return UserRestMapper.toResponse(user);
-  }
+    @Override
+    public UserRestResponse create(CreateUserRestRequest request) {
+        return null;
+    }
 
-  @DeleteMapping("/{id}")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void delete(@PathVariable final String id) {
-    final DeleteUserCommand command = UserRestMapper.toDeleteCommand(id);
-    deleteUserUseCase.execute(command);
-  }
+    // Cachea la lista de DTO (UserRestResponse), nunca UserModel.
+    @GetMapping
+    @Cacheable(cacheNames = CacheConfig.USERS_LIST, key = "'all'")
+    public List<UserRestResponse> getAll() {
+        return UserRestMapper.toResponseList(getAllUsersUseCase.execute());
+    }
+
+    // Cachea el DTO individual por id.
+    @GetMapping("/{id}")
+    @Cacheable(cacheNames = CacheConfig.USER_BY_ID, key = "#id")
+    public UserRestResponse getById(@PathVariable final String id) {
+        final GetUserByIdQuery query = UserRestMapper.toGetByIdQuery(id);
+        final UserModel user = getUserByIdUseCase.execute(query);
+        return UserRestMapper.toResponse(user);
+    }
+
+    // Invalida la lista y la entrada de ese usuario.
+    @PutMapping("/{id}")
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheConfig.USERS_LIST, key = "'all'"),
+            @CacheEvict(cacheNames = CacheConfig.USER_BY_ID, key = "#id")
+    })
+    public UserRestResponse update(
+            @PathVariable final String id,
+            @Valid @RequestBody final UpdateUserRestRequest request) {
+        final UpdateUserCommand command = UserRestMapper.toUpdateCommand(id, request);
+        final UserModel user = updateUserUseCase.execute(command);
+        return UserRestMapper.toResponse(user);
+    }
+
+    // Invalida la lista y la entrada de ese usuario.
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Caching(evict = {
+            @CacheEvict(cacheNames = CacheConfig.USERS_LIST, key = "'all'"),
+            @CacheEvict(cacheNames = CacheConfig.USER_BY_ID, key = "#id")
+    })
+    public void delete(@PathVariable final String id) {
+        final DeleteUserCommand command = UserRestMapper.toDeleteCommand(id);
+        deleteUserUseCase.execute(command);
+    }
 }
-
