@@ -15,7 +15,7 @@ import java.util.List;
 @UtilityClass
 public class UserRestMapper {
 
-  public CreateUserCommand toCreateCommand(final CreateUserRestRequest request) {
+  public CreateUserCommand toCreateCommand(final CreateUserRestRequest request, String assignedRole) {
     return new CreateUserCommand(
         request.id(),
         request.name(),
