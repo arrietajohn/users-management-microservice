@@ -1,5 +1,6 @@
 services:
   mysql:
+    profiles: ["mysql"]
     image: mysql:8.4
     environment:
       MYSQL_DATABASE: crud_usuarios
@@ -21,15 +22,39 @@ services:
       start_period: 20s
     restart: unless-stopped
 
+  postgres:
+    profiles: ["postgres"]
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: crud_usuarios
+      POSTGRES_USER: users_app
+      POSTGRES_PASSWORD: local_users_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./src/main/resources/schema-postgresql.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U users_app -d crud_usuarios
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+    restart: unless-stopped
+
   api:
+    profiles: ["mysql", "postgres"]
     build:
       context: .
       dockerfile: Dockerfile
     image: users-management-api:local
     environment:
       PORT: "8080"
-      DB_HOST: mysql
-      DB_PORT: "3306"
+      DB_VENDOR: ${DB_VENDOR:-mysql}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
       DB_NAME: crud_usuarios
       DB_USERNAME: users_app
       DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD en el archivo .env local}
@@ -44,9 +69,14 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+        required: false
+      postgres:
+        condition: service_healthy
+        required: false
     restart: unless-stopped
     security_opt:
       - no-new-privileges:true
 
 volumes:
   mysql-data:
+  postgres-data:

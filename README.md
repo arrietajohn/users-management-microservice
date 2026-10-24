@@ -13,6 +13,30 @@ Spring es el único *composition root*: `Main` inicia el contexto y las dependen
 
 En Windows se puede utilizar `mvnw.cmd`.
 
+## Motores de base de datos soportados
+
+La capa de persistencia expone dos adaptadores equivalentes y se selecciona uno segun `db.vendor`:
+
+| `DB_VENDOR` | Adaptador | Script de esquema |
+| --- | --- | --- |
+| `mysql` (por defecto) | `UserRepositoryMySQL` | `src/main/resources/schema.sql` |
+| `postgresql` | `UserRepositoryPostgreSQL` | `src/main/resources/schema-postgresql.sql` |
+
+Ambos adaptadores implementan los mismos puertos de salida, asi que la capa de aplicacion y el
+dominio no cambian.
+
+### Desarrollo local con Docker
+
+```bash
+# MySQL (por defecto)
+docker compose --profile mysql up --build
+
+# PostgreSQL
+DB_VENDOR=postgresql DB_HOST=postgres DB_PORT=5432 docker compose --profile postgres up --build
+```
+
+La API queda en `http://localhost:8080` y Swagger UI en `/swagger-ui.html`.
+
 ## Secretos para desarrollo local
 
 Copiar `application-secrets.properties.example` como
@@ -23,18 +47,10 @@ Brevo. La carpeta `.environments` esta excluida de Git y del contexto de Docker.
 En produccion no se utiliza este archivo: los secretos deben configurarse mediante las
 variables de entorno `DB_*`, `JWT_SECRET` y `BREVO_*` del proveedor de despliegue.
 
-## Docker Compose local
-
-Copiar `compose.env.example` como `.env`, reemplazar todos los valores y ejecutar:
-
-```bash
-docker compose up --build
-```
-
-Compose se detiene con un error si falta `DB_PASSWORD`, `MYSQL_ROOT_PASSWORD`,
-`JWT_SECRET`, `BREVO_API_KEY` o `BREVO_FROM_ADDRESS`. El archivo `.env` esta excluido
-de Git y del contexto de construccion Docker. Los puertos de MySQL y la API se publican
-solo en `127.0.0.1`.
+Copiar `compose.env.example` como `.env`, reemplazar todos los valores antes de ejecutar
+`docker compose`: `DB_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `JWT_SECRET`, `BREVO_API_KEY` y
+`BREVO_FROM_ADDRESS` son obligatorios. Los puertos de MySQL y la API se publican solo en
+`127.0.0.1`.
 
 ## Despliegue en Render
 
@@ -43,9 +59,13 @@ automático de cada commit que llegue a la rama `main`.
 
 1. Crear un Blueprint en Render y seleccionar este repositorio.
 2. Completar en el panel los secretos marcados como requeridos: `DB_HOST`,
+1. Crear un Blueprint en Render y seleccionar este repositorio.
+2. Completar en el panel los secretos marcados como requeridos: `DB_HOST`,
    `DB_USERNAME`, `DB_PASSWORD`, `BREVO_API_KEY` y `BREVO_FROM_ADDRESS`.
-3. Usar una instancia MySQL accesible desde Internet o desde la red privada de
-   Render y ejecutar `src/main/resources/schema.sql` una vez para crear el esquema.
+3. Ejecutar el script de esquema **correspondiente al motor configurado** una sola vez:
+   `schema.sql` para MySQL/TiDB o `schema-postgresql.sql` para Supabase/PostgreSQL.
+   El script de PostgreSQL no crea la base: se provisiona desde el panel del proveedor
+   y el script se ejecuta ya dentro de ella.
 4. Desplegar el Blueprint. La API quedará disponible en el subdominio
    `onrender.com` asignado por Render y Swagger UI en `/swagger-ui.html`.
 
