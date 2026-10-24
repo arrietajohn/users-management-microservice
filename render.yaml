@@ -7,6 +7,7 @@ services:
     autoDeployTrigger: commit
     healthCheckPath: /v3/api-docs
     envVars:
+      # Motor de base de datos: la app usa MySQL por defecto (db.vendor=${DB_VENDOR:mysql}).
       - key: DB_HOST
         sync: false
       - key: DB_PORT
@@ -17,8 +18,11 @@ services:
         sync: false
       - key: DB_PASSWORD
         sync: false
+      # TiDB exige TLS y el proyecto soporta VERIFY_IDENTITY (certificado validado).
       - key: DB_SSL_MODE
-        value: REQUIRED
+        sync: false
+      # Clave API REST de Brevo. Render bloquea los puertos SMTP salientes (25/587/465),
+      # por eso el envio se hace contra https://api.brevo.com (HTTPS 443).
       - key: BREVO_API_KEY
         sync: false
       - key: BREVO_FROM_ADDRESS
@@ -28,4 +32,4 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRATION_SECONDS
-        value: "900"
+        sync: false

@@ -22,6 +22,7 @@
     <lombok.version>1.18.36</lombok.version>
     <mysql.connector.version>9.3.0</mysql.connector.version>
     <resilience4j.version>2.2.0</resilience4j.version>
+    <postgresql.connector.version>42.7.4</postgresql.connector.version>
     <bcrypt.version>0.10.2</bcrypt.version>
     <jjwt.version>0.13.0</jjwt.version>
     <!-- Declarativas: Mockito y Jacoco siguen siendo explícitas para tener control -->
@@ -76,6 +77,13 @@
       <groupId>com.mysql</groupId>
       <artifactId>mysql-connector-j</artifactId>
       <version>${mysql.connector.version}</version>
+    </dependency>
+
+    <!-- PostgreSQL JDBC Connector - adaptador de persistencia alterna (db.vendor=postgresql) -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>${postgresql.connector.version}</version>
     </dependency>
 
     <!-- Resiliencia para el cliente HTTP de Brevo -->

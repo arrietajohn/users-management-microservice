@@ -19,8 +19,10 @@ public class DataSourceSpringConfig {
   private static final String PROP_DB_USERNAME = "${db.username}";
   private static final String PROP_DB_PASSWORD = "${db.password}";
   private static final String PROP_DB_SSL_MODE = "${db.ssl-mode}";
+  private static final String PROP_DB_VENDOR   = "${db.vendor}";
 
-  private static final String LOG_DATASOURCE_INIT = "[DataSourceSpringConfig] DataSource inicializado. host={} port={}";
+  private static final String LOG_DATASOURCE_INIT =
+      "[DataSourceSpringConfig] DataSource inicializado. vendor={} host={} port={}";
 
   @Value(PROP_DB_HOST)
   private String dbHost;
@@ -40,20 +42,25 @@ public class DataSourceSpringConfig {
   @Value(PROP_DB_SSL_MODE)
   private String dbSslMode;
 
+  @Value(PROP_DB_VENDOR)
+  private String dbVendor;
+
   @Bean
   public DataSource dataSource() {
     final DatabaseConfig config =
-        new DatabaseConfig(dbHost, dbPort, dbName, dbUsername, dbPassword, dbSslMode);
+        new DatabaseConfig(
+            dbHost, dbPort, dbName, dbUsername, dbPassword, dbSslMode, dbVendor);
 
     final HikariConfig hikariConfig = new HikariConfig();
     hikariConfig.setJdbcUrl(config.buildJdbcUrl());
+    hikariConfig.setDriverClassName(config.driverClassName());
     hikariConfig.setUsername(config.username());
     hikariConfig.setPassword(config.password());
     hikariConfig.setMaximumPoolSize(10);
     hikariConfig.setMinimumIdle(2);
     hikariConfig.setConnectionTimeout(30_000);
 
-    log.info(LOG_DATASOURCE_INIT, dbHost, dbPort);
+    log.info(LOG_DATASOURCE_INIT, dbVendor, dbHost, dbPort);
     return new HikariDataSource(hikariConfig);
   }
 }
