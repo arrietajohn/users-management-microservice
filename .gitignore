@@ -45,3 +45,5 @@ build/
 local.env
 aiven.env
 render.env
+render-api.env
+tidb.env
