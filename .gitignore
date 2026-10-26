@@ -41,3 +41,14 @@ build/
 *.log
 
 /spec/
+# Variables locales con credenciales
+local.env
+aiven.env
+render.env
+render-api.env
+tidb.env
+brevo.env
+
+# Secretos locales. Nunca deben versionarse.
+/.environments/
+/.env
