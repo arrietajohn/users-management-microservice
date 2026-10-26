@@ -41,3 +41,7 @@ build/
 *.log
 
 /spec/
+# Variables locales con credenciales
+local.env
+aiven.env
+render.env
