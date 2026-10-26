@@ -48,3 +48,7 @@ render.env
 render-api.env
 tidb.env
 brevo.env
+
+# Secretos locales. Nunca deben versionarse.
+/.environments/
+/.env
