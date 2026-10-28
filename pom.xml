@@ -12,7 +12,7 @@
 
   <groupId>com.jcaa.usersmanagement</groupId>
   <artifactId>users-management</artifactId>
-  <version>2.1.5</version>
+  <version>2.1.6</version>
 
   <properties>
     <!-- El parent de Spring Boot usa java.version para configurar el compilador -->
