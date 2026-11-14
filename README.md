@@ -71,6 +71,43 @@ Las dos recorren el flujo completo: health, 401 sin token, login, listar, crear 
 consultar por id, login rechazado mientras está `PENDING`, activar, login aceptado, eliminar y
 consultar el eliminado (404).
 
+## Base de datos remota en Aiven (Guía 2)
+
+1. Crear un servicio MySQL en https://console.aiven.io (plan Developer).
+2. Crear la base y las tablas en Aiven con el mismo `schema.sql`. Los datos están en *Connection information*:
+
+   ```bash
+   mysql -h <host> -P <puerto> -u avnadmin -p --ssl-mode=REQUIRED < src/main/resources/schema.sql
+   ```
+
+3. En `.env` cambiar solo la conexión. El código no cambia:
+
+   ```properties
+   DB_HOST=<host>.aivencloud.com
+   DB_PORT=<puerto>
+   DB_USERNAME=avnadmin
+   DB_PASSWORD=<clave de Aiven>
+   DB_SSL_MODE=REQUIRED
+   ```
+
+   `REQUIRED` es obligatorio de nuestro lado. El servidor de Aiven tiene
+   `require_secure_transport=OFF` y acepta también conexiones sin cifrar. Con `DISABLED`, la
+   contraseña y los datos viajarían en texto plano por Internet.
+
+### Medir el tiempo de respuesta
+
+`scripts/medir-latencia.sh` inicia sesión y hace N llamadas a `GET /api/users`, que consulta la base
+en cada llamada. Muestra el promedio, p50, p95 y el máximo:
+
+```bash
+scripts/medir-latencia.sh http://localhost:8080 50
+```
+
+| Base de datos | Promedio | p95 |
+|---|---|---|
+| MySQL local | 1,5 ms | 1,8 ms |
+| Aiven (North America), desde Colombia | 107,4 ms | 179,8 ms |
+
 ## Despliegue en Render
 
 El archivo `render.yaml` define el servicio web, el build con Docker y el despliegue
