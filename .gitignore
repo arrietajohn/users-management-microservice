@@ -32,7 +32,11 @@ build/
 !**/src/test/**/build/
 
 ### VS Code ###
-.vscode/
+# Se versionan solo la configuracion de ejecucion y las extensiones recomendadas
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
 
 ### Mac OS ###
 .DS_Store

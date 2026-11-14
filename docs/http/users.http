@@ -1,0 +1,84 @@
+### Colección de peticiones de la API users-management (Guía 1)
+### Funciona en VS Code/Antigravity (extensión REST Client) y en IntelliJ (HTTP Client integrado).
+### Ejecute las peticiones en orden: el login guarda el token y lo usan las demás.
+
+@baseUrl = http://localhost:8080
+@userId = 11111111-2222-3333-4444-555555555555
+
+### 1. Estado del servicio (público)
+GET {{baseUrl}}/health
+
+### 2. Sin token: debe responder 401
+GET {{baseUrl}}/api/users
+
+### 3. Login del administrador: devuelve el accessToken (JWT)
+# @name login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Admin1234!"
+}
+
+###
+@token = {{login.response.body.accessToken}}
+
+### 4. Listar usuarios: 200
+GET {{baseUrl}}/api/users
+Authorization: Bearer {{token}}
+
+### 5. Crear usuario (ejercicio): 201, queda en estado PENDING
+POST {{baseUrl}}/api/users
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "id": "{{userId}}",
+  "name": "Estudiante Prueba",
+  "email": "estudiante.prueba@example.com",
+  "password": "Prueba1234!",
+  "role": "MEMBER"
+}
+
+### 6. Obtener usuario por id (ejercicio): 200
+GET {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{token}}
+
+### 7. Login de un usuario PENDING: debe responder 401
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "estudiante.prueba@example.com",
+  "password": "Prueba1234!"
+}
+
+### 8. Actualizar usuario a ACTIVE: 200
+PUT {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Estudiante Prueba",
+  "email": "estudiante.prueba@example.com",
+  "role": "MEMBER",
+  "status": "ACTIVE"
+}
+
+### 9. Login del usuario ya activo: 200
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "estudiante.prueba@example.com",
+  "password": "Prueba1234!"
+}
+
+### 10. Eliminar usuario por id (ejercicio): 204
+DELETE {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{token}}
+
+### 11. Consultar el usuario eliminado: 404
+GET {{baseUrl}}/api/users/{{userId}}
+Authorization: Bearer {{token}}

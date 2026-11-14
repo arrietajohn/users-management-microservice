@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "preparar-build-info",
+      "detail": "Genera META-INF/build-info.properties, que necesita el endpoint /health",
+      "type": "shell",
+      "command": "./mvnw -q -DskipTests process-resources",
+      "windows": { "command": ".\\mvnw.cmd -q -DskipTests process-resources" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Ejecutar con Maven (spring-boot:run)",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "windows": { "command": ".\\mvnw.cmd spring-boot:run" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Pruebas y cobertura (verify)",
+      "type": "shell",
+      "command": "./mvnw clean verify",
+      "windows": { "command": ".\\mvnw.cmd clean verify" },
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}
