@@ -1,0 +1,46 @@
+# Integración continua: compila, corre las pruebas y genera la cobertura en cada PR y en cada push a main.
+# Render (render.yaml, autoDeployTrigger: checksPass) solo despliega un commit de main si este job pasa.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Compilar y probar (Java 17)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar JDK 17 (Temurin) con caché de Maven
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Compilar, probar y medir cobertura
+        run: ./mvnw -B -ntp clean verify
+
+      - name: Construir la imagen Docker (la misma que usa Render)
+        run: docker build --tag users-management-api:ci .
+
+      - name: Publicar el reporte de cobertura
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-cobertura-jacoco
+          path: target/site/jacoco/
+          if-no-files-found: ignore

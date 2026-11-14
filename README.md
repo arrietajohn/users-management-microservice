@@ -108,6 +108,24 @@ scripts/medir-latencia.sh http://localhost:8080 50
 | MySQL local | 1,5 ms | 1,8 ms |
 | Aiven (North America), desde Colombia | 107,4 ms | 179,8 ms |
 
+## Integración y despliegue continuos (Guía 3)
+
+```
+PR o push a main ──► GitHub Actions (CI) ──► ¿verde? ──► Render construye la imagen Docker y despliega
+                     compila · 194 pruebas              (autoDeployTrigger: checksPass)
+                     cobertura · docker build
+```
+
+- **CI** (`.github/workflows/ci.yml`): en cada PR y en cada push a `main` corre `./mvnw verify` con Java 17,
+  construye la imagen Docker y publica el reporte de cobertura de JaCoCo como artefacto.
+- **CD** (`render.yaml`): Render despliega `main` automáticamente, pero solo cuando la CI de ese commit pasa.
+  Un commit que rompe las pruebas no llega a producción.
+- Región `virginia`: es la región de Render más cercana a la base de datos (Aiven, en New Jersey).
+
+> En el plan gratis de Render están bloqueados los puertos SMTP 25, 465 y 587, así que el envío de
+> correo por Gmail falla en la nube. El usuario igual se crea, porque el correo se envía de forma
+> asíncrona. La guía 5 lo resuelve enviando el correo por la API HTTPS de Brevo.
+
 ## Despliegue en Render
 
 El archivo `render.yaml` define el servicio web, el build con Docker y el despliegue

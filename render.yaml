@@ -3,8 +3,11 @@ services:
     name: users-management-api
     runtime: docker
     plan: free
+    # Aiven (MySQL de la guia 2) quedo en DigitalOcean, New Jersey: Virginia es la region de Render mas cercana
+    region: virginia
     branch: main
-    autoDeployTrigger: commit
+    # Despliega solo cuando la CI de GitHub Actions (.github/workflows/ci.yml) termina en verde
+    autoDeployTrigger: checksPass
     healthCheckPath: /health
     envVars:
       - key: DB_HOST
