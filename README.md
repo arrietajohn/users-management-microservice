@@ -54,7 +54,13 @@ Requisitos: JDK 17 o superior, MySQL 8.4 y Git. Maven no hace falta: el proyecto
 | NetBeans | *Open Project* y elegir la carpeta del repo | *Run Project* sobre la clase `com.jcaa.usersmanagement.Main` |
 
 Las configuraciones de IntelliJ y VS Code fijan la raíz del repo como directorio de trabajo para que
-se cargue `.env`.
+se cargue `.env`. Antes de arrancar corren `mvnw process-resources`, que genera
+`META-INF/build-info.properties`. El endpoint `/health` lo necesita, y cuando el IDE compila sin
+pasar por Maven ese archivo no existe y la aplicación no arranca
+(`Consider defining a bean of type 'BuildProperties'`).
+
+En VS Code / Antigravity también quedan tareas en *Terminal → Run Task*: ejecutar con
+`spring-boot:run` y correr las pruebas con cobertura (`verify`).
 
 ### Colección de peticiones
 
