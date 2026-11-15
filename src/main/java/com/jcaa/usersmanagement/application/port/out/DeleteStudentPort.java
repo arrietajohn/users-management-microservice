@@ -1,4 +1,7 @@
 package com.jcaa.usersmanagement.application.port.out;
 
-public class DeleteStudentPort {
+import com.jcaa.usersmanagement.domain.valueobject.StudentId;
+
+public interface DeleteStudentPort {
+    void delete(StudentId studentId);
 }

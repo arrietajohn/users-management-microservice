@@ -1,4 +1,8 @@
 package com.jcaa.usersmanagement.application.port.out;
 
-public class GetAllStudentsPort {
+import com.jcaa.usersmanagement.domain.model.StudentModel;
+import java.util.List;
+
+public interface GetAllStudentsPort {
+    List<StudentModel> getAll();
 }

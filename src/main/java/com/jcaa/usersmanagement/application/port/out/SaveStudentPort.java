@@ -1,4 +1,7 @@
 package com.jcaa.usersmanagement.application.port.out;
 
-public class SaveStudentPort {
+import com.jcaa.usersmanagement.domain.model.StudentModel;
+
+public interface SaveStudentPort {
+    StudentModel save(StudentModel student);
 }
