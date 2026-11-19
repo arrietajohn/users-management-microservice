@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -27,9 +28,9 @@ public class SecurityConfig {
       final RestAuthenticationEntryPoint authenticationEntryPoint,
       final RestAccessDeniedHandler accessDeniedHandler)
       throws Exception {
-    http.csrf(csrf -> csrf.disable())
-        .httpBasic(httpBasic -> httpBasic.disable())
-        .formLogin(formLogin -> formLogin.disable())
+    http.csrf(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .formLogin(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(
@@ -40,6 +41,8 @@ public class SecurityConfig {
         .authorizeHttpRequests(
             authorization ->
                 authorization
+                    .requestMatchers(HttpMethod.GET, "/health")
+                    .permitAll()
                     .requestMatchers(AUTH_LOGIN_PATH)
                     .permitAll()
                     .requestMatchers(OPEN_API_PATHS)

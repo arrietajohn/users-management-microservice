@@ -6,6 +6,15 @@ Spring es el único *composition root*: `Main` inicia el contexto y las dependen
 
 ## Verificación
 
+`GET /health` es publico y responde HTTP 200 con los metadatos generados desde
+`pom.xml` durante el build:
+
+```json
+{"status":"UP","name":"users-management","version":"2.2.0"}
+```
+
+Indica que la API responde; no comprueba MySQL ni el proveedor de correo.
+
 ```bash
 ./mvnw clean test
 ./mvnw clean package
