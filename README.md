@@ -6,7 +6,7 @@ Spring es el único *composition root*: `Main` inicia el contexto y las dependen
 
 ## Arquitectura
 
-Consulta el [índice de diagramas](.diagramas/arquitectura/README.md) para explorar el contexto general, la arquitectura hexagonal, los flujos de los endpoints y el ciclo de vida de usuario.
+Consulta el [índice de diagramas](https://arrietajohn.github.io/users-management-microservice/) para explorar el contexto general, la arquitectura hexagonal, los flujos de los endpoints y el ciclo de vida de usuario.
 
 ## Verificación
 
@@ -14,7 +14,7 @@ Consulta el [índice de diagramas](.diagramas/arquitectura/README.md) para explo
 `pom.xml` durante el build:
 
 ```json
-{"status":"UP","name":"users-management","version":"2.2.2"}
+{"status":"UP","name":"users-management","version":"2.2.3"}
 ```
 
 Indica que la API responde; no comprueba MySQL ni el proveedor de correo.

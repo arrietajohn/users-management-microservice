@@ -2,19 +2,19 @@
 
 ## Vistas generales
 
-- [Contexto general](contexto.html): clientes HTTP, consola, casos de uso, persistencia y correo.
-- [Arquitectura hexagonal](hexagonal.html): entradas, puertos, aplicación, dominio, adaptadores y proveedores.
+- [Contexto general](https://arrietajohn.github.io/users-management-microservice/contexto.html): clientes HTTP, consola, casos de uso, persistencia y correo.
+- [Arquitectura hexagonal](https://arrietajohn.github.io/users-management-microservice/hexagonal.html): entradas, puertos, aplicación, dominio, adaptadores y proveedores.
 
 ## Recorridos HTTP
 
-- [Crear usuario — POST /api/users](crear.html)
-- [Listar usuarios — GET /api/users](listar.html)
-- [Consultar usuario — GET /api/users/{id}](consultar.html)
-- [Actualizar usuario — PUT /api/users/{id}](actualizar.html)
-- [Eliminar usuario — DELETE /api/users/{id}](eliminar.html)
-- [Autenticar — POST /api/auth/login](login.html)
-- [Salud — GET /health](salud.html)
+- [Crear usuario — POST /api/users](https://arrietajohn.github.io/users-management-microservice/crear.html)
+- [Listar usuarios — GET /api/users](https://arrietajohn.github.io/users-management-microservice/listar.html)
+- [Consultar usuario — GET /api/users/{id}](https://arrietajohn.github.io/users-management-microservice/consultar.html)
+- [Actualizar usuario — PUT /api/users/{id}](https://arrietajohn.github.io/users-management-microservice/actualizar.html)
+- [Eliminar usuario — DELETE /api/users/{id}](https://arrietajohn.github.io/users-management-microservice/eliminar.html)
+- [Autenticar — POST /api/auth/login](https://arrietajohn.github.io/users-management-microservice/login.html)
+- [Salud — GET /health](https://arrietajohn.github.io/users-management-microservice/salud.html)
 
 ## Dominio
 
-- [Ciclo de vida de usuario](ciclo-usuario.html): estados del usuario desde su creación hasta su eliminación.
+- [Ciclo de vida de usuario](https://arrietajohn.github.io/users-management-microservice/ciclo-usuario.html): estados del usuario desde su creación hasta su eliminación.
