@@ -4,13 +4,17 @@ Aplicación de gestión de usuarios construida con Java 17 y Spring Boot. La API
 
 Spring es el único *composition root*: `Main` inicia el contexto y las dependencias se resuelven mediante configuración y component scanning de Spring.
 
+## Arquitectura
+
+Consulta el [índice de diagramas](.diagramas/arquitectura/README.md) para explorar el contexto general, la arquitectura hexagonal, los flujos de los endpoints y el ciclo de vida de usuario.
+
 ## Verificación
 
 `GET /health` es publico y responde HTTP 200 con los metadatos generados desde
 `pom.xml` durante el build:
 
 ```json
-{"status":"UP","name":"users-management","version":"2.2.0"}
+{"status":"UP","name":"users-management","version":"2.2.1"}
 ```
 
 Indica que la API responde; no comprueba MySQL ni el proveedor de correo.

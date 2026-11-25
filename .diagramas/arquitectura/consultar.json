@@ -1,0 +1,175 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "GET /api/users/{id}",
+    "locale": "es",
+    "output": ".diagramas/arquitectura/consultar.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/arrietajohn/users-management-microservice",
+      "revision": "fb19417f94b26958f35463cc855b3f91c5bd31d0"
+    }
+  },
+  "participants": [
+    {
+      "id": "cliente",
+      "label": "Cliente",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/UserRestController.java",
+          "line": 1,
+          "end_line": 79
+        }
+      ]
+    },
+    {
+      "id": "filtro",
+      "label": "Seguridad HTTP",
+      "type": "security",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/security/SecurityConfig.java",
+          "line": 1,
+          "end_line": 63
+        }
+      ]
+    },
+    {
+      "id": "controlador",
+      "label": "Controlador REST",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/UserRestController.java",
+          "line": 1,
+          "end_line": 79
+        }
+      ]
+    },
+    {
+      "id": "puerto",
+      "label": "GetUserByIdUseCase",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/port/in/GetUserByIdUseCase.java",
+          "line": 1,
+          "end_line": 10
+        }
+      ]
+    },
+    {
+      "id": "servicio",
+      "label": "GetUserByIdService",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/service/GetUserByIdService.java",
+          "line": 1,
+          "end_line": 41
+        }
+      ]
+    },
+    {
+      "id": "adaptador",
+      "label": "UserRepositoryMySQL",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    },
+    {
+      "id": "db",
+      "label": "MySQL",
+      "type": "database",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "from": "cliente",
+      "to": "filtro",
+      "y": 170,
+      "label": "GET /api/users/{id}"
+    },
+    {
+      "from": "filtro",
+      "to": "controlador",
+      "y": 212,
+      "label": "Si la política autoriza"
+    },
+    {
+      "from": "controlador",
+      "to": "puerto",
+      "y": 254,
+      "label": "execute"
+    },
+    {
+      "from": "puerto",
+      "to": "servicio",
+      "y": 296,
+      "label": "implementación"
+    },
+    {
+      "from": "servicio",
+      "to": "adaptador",
+      "y": 338,
+      "label": "Valida id y busca; si no existe: 404."
+    },
+    {
+      "from": "adaptador",
+      "to": "db",
+      "y": 380,
+      "label": "SELECT por id"
+    },
+    {
+      "from": "db",
+      "to": "adaptador",
+      "y": 422,
+      "label": "resultado SQL",
+      "variant": "return"
+    },
+    {
+      "from": "adaptador",
+      "to": "servicio",
+      "y": 464,
+      "label": "modelo / resultado",
+      "variant": "return"
+    },
+    {
+      "from": "servicio",
+      "to": "controlador",
+      "y": 506,
+      "label": "resultado del caso de uso"
+    },
+    {
+      "from": "controlador",
+      "to": "cliente",
+      "y": 548,
+      "label": "200 usuario",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Condiciones y errores",
+      "items": [
+        "Requiere ADMIN o REVIEWER.",
+        "El manejo REST traduce validación y excepciones; errores de persistencia producen 500."
+      ]
+    }
+  ]
+}

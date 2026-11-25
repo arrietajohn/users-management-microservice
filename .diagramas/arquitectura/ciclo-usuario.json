@@ -1,0 +1,195 @@
+{
+  "schema_version": 3,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Ciclo de vida de UserModel",
+    "locale": "es",
+    "output": ".diagramas/arquitectura/ciclo-usuario.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/arrietajohn/users-management-microservice",
+      "revision": "fb19417f94b26958f35463cc855b3f91c5bd31d0"
+    }
+  },
+  "mainPath": [
+    "nuevo",
+    "pending",
+    "active",
+    "inactive",
+    "blocked",
+    "deleted"
+  ],
+  "states": [
+    {
+      "id": "nuevo",
+      "type": "start",
+      "label": "Sin crear",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/domain/model/UserModel.java",
+          "line": 1,
+          "end_line": 37
+        }
+      ]
+    },
+    {
+      "id": "pending",
+      "type": "active",
+      "label": "PENDING",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/domain/model/UserModel.java",
+          "line": 1,
+          "end_line": 37
+        }
+      ]
+    },
+    {
+      "id": "active",
+      "type": "active",
+      "label": "ACTIVE",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/service/mapper/UserApplicationMapper.java",
+          "line": 1,
+          "end_line": 58
+        }
+      ]
+    },
+    {
+      "id": "inactive",
+      "type": "neutral",
+      "label": "INACTIVE",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/service/mapper/UserApplicationMapper.java",
+          "line": 1,
+          "end_line": 58
+        }
+      ]
+    },
+    {
+      "id": "blocked",
+      "type": "neutral",
+      "label": "BLOCKED",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/domain/enums/UserStatus.java",
+          "line": 1,
+          "end_line": 19
+        }
+      ]
+    },
+    {
+      "id": "deleted",
+      "type": "neutral",
+      "label": "Eliminado",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    }
+  ],
+  "transitions": [
+    {
+      "from": "nuevo",
+      "to": "pending",
+      "label": "crear"
+    },
+    {
+      "from": "pending",
+      "to": "active",
+      "label": "actualizar status"
+    },
+    {
+      "from": "active",
+      "to": "inactive",
+      "label": "actualizar status"
+    },
+    {
+      "from": "inactive",
+      "to": "blocked",
+      "label": "actualizar status"
+    },
+    {
+      "from": "blocked",
+      "to": "deleted",
+      "label": "eliminar"
+    },
+    {
+      "from": "pending",
+      "to": "inactive",
+      "label": "actualizar status"
+    },
+    {
+      "from": "pending",
+      "to": "blocked",
+      "label": "actualizar status"
+    },
+    {
+      "from": "pending",
+      "to": "deleted",
+      "label": "eliminar"
+    },
+    {
+      "from": "active",
+      "to": "pending",
+      "label": "actualizar status"
+    },
+    {
+      "from": "active",
+      "to": "blocked",
+      "label": "actualizar status"
+    },
+    {
+      "from": "active",
+      "to": "deleted",
+      "label": "eliminar"
+    },
+    {
+      "from": "inactive",
+      "to": "pending",
+      "label": "actualizar status"
+    },
+    {
+      "from": "inactive",
+      "to": "active",
+      "label": "actualizar status"
+    },
+    {
+      "from": "inactive",
+      "to": "deleted",
+      "label": "eliminar"
+    },
+    {
+      "from": "blocked",
+      "to": "pending",
+      "label": "actualizar status"
+    },
+    {
+      "from": "blocked",
+      "to": "active",
+      "label": "actualizar status"
+    },
+    {
+      "from": "blocked",
+      "to": "inactive",
+      "label": "actualizar status"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Reglas reales",
+      "items": [
+        "La actualización acepta cualquiera de los cuatro estados, sin validar transición previa; se muestran todas las transiciones entre estados distintos.",
+        "activate() y deactivate() crean una nueva instancia, pero no se identificó un endpoint específico que las invoque.",
+        "El borrado es físico; eliminado no es un valor de UserStatus.",
+        "EmailDestinationModel es un valor inmutable de notificación, sin estados ni ciclo persistido."
+      ]
+    }
+  ]
+}

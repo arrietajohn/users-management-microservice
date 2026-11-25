@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Contexto general de gestión de usuarios",
+    "locale": "es",
+    "output": ".diagramas/arquitectura/contexto.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/arrietajohn/users-management-microservice",
+      "revision": "fb19417f94b26958f35463cc855b3f91c5bd31d0"
+    }
+  },
+  "layout": {
+    "mode": "auto"
+  },
+  "components": [
+    {
+      "id": "cliente",
+      "label": "Cliente HTTP",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/UserRestController.java",
+          "line": 1,
+          "end_line": 79
+        }
+      ]
+    },
+    {
+      "id": "operador",
+      "label": "Operador de consola",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/desktop/cli/UserManagementCli.java",
+          "line": 1,
+          "end_line": 90
+        }
+      ]
+    },
+    {
+      "id": "seguridad",
+      "label": "Seguridad REST",
+      "type": "security",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/security/SecurityConfig.java",
+          "line": 1,
+          "end_line": 63
+        }
+      ],
+      "sublabel": "JWT y roles"
+    },
+    {
+      "id": "rest",
+      "label": "Controladores REST",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/UserRestController.java",
+          "line": 1,
+          "end_line": 79
+        }
+      ],
+      "sublabel": "Usuarios, login y salud"
+    },
+    {
+      "id": "cli",
+      "label": "CLI inactiva",
+      "type": "frontend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/desktop/controller/UserController.java",
+          "line": 1,
+          "end_line": 61
+        }
+      ],
+      "sublabel": "Código conservado"
+    },
+    {
+      "id": "servicios",
+      "label": "Casos de uso",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/service/CreateUserService.java",
+          "line": 1,
+          "end_line": 60
+        }
+      ],
+      "sublabel": "Usuarios y login"
+    },
+    {
+      "id": "dominio",
+      "label": "Modelo de usuario",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/domain/model/UserModel.java",
+          "line": 1,
+          "end_line": 37
+        }
+      ]
+    },
+    {
+      "id": "persistencia",
+      "label": "Adaptador JDBC",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    },
+    {
+      "id": "db",
+      "label": "MySQL",
+      "type": "database",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    },
+    {
+      "id": "notificacion",
+      "label": "Notificaciones",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/service/EmailNotificationService.java",
+          "line": 1,
+          "end_line": 107
+        }
+      ],
+      "sublabel": "Asíncronas"
+    },
+    {
+      "id": "correo",
+      "label": "Adaptador de correo",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/email/JavaMailEmailSenderAdapter.java",
+          "line": 1,
+          "end_line": 87
+        }
+      ]
+    },
+    {
+      "id": "smtp",
+      "label": "Servidor SMTP",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/email/JavaMailEmailSenderAdapter.java",
+          "line": 1,
+          "end_line": 87
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "cliente",
+      "to": "seguridad",
+      "label": "HTTP"
+    },
+    {
+      "from": "seguridad",
+      "to": "rest",
+      "label": "autoriza"
+    },
+    {
+      "from": "operador",
+      "to": "cli",
+      "label": "comandos"
+    },
+    {
+      "from": "cli",
+      "to": "servicios",
+      "label": "ejecuta"
+    },
+    {
+      "from": "rest",
+      "to": "servicios",
+      "label": "ejecuta"
+    },
+    {
+      "from": "servicios",
+      "to": "dominio",
+      "label": "usa"
+    },
+    {
+      "from": "servicios",
+      "to": "persistencia",
+      "label": "puertos de salida"
+    },
+    {
+      "from": "persistencia",
+      "to": "db",
+      "label": "SQL"
+    },
+    {
+      "from": "servicios",
+      "to": "notificacion",
+      "label": "alta y edición"
+    },
+    {
+      "from": "notificacion",
+      "to": "correo",
+      "label": "puerto de correo"
+    },
+    {
+      "from": "correo",
+      "to": "smtp",
+      "label": "SMTP"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Alcance",
+      "items": [
+        "Salud responde desde el controlador con metadatos de compilación; no consulta MySQL.",
+        "La entrega de correo se ejecuta de forma asíncrona en alta y actualización.",
+        "La CLI se conserva en el código, pero Main inicia únicamente Spring Boot; no es una entrada activa."
+      ]
+    }
+  ]
+}

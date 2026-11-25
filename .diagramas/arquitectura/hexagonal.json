@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Arquitectura hexagonal",
+    "locale": "es",
+    "output": ".diagramas/arquitectura/hexagonal.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/arrietajohn/users-management-microservice",
+      "revision": "fb19417f94b26958f35463cc855b3f91c5bd31d0"
+    }
+  },
+  "layout": {
+    "mode": "auto"
+  },
+  "components": [
+    {
+      "id": "actores",
+      "label": "Cliente HTTP / operador",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/desktop/cli/UserManagementCli.java",
+          "line": 1,
+          "end_line": 90
+        }
+      ]
+    },
+    {
+      "id": "rest",
+      "label": "Entrada REST y JWT",
+      "type": "security",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/security/SecurityConfig.java",
+          "line": 1,
+          "end_line": 63
+        }
+      ]
+    },
+    {
+      "id": "cli",
+      "label": "CLI inactiva",
+      "type": "frontend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/desktop/controller/UserController.java",
+          "line": 1,
+          "end_line": 61
+        }
+      ],
+      "sublabel": "Código conservado"
+    },
+    {
+      "id": "in",
+      "label": "Puertos de entrada",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/port/in/CreateUserUseCase.java",
+          "line": 1,
+          "end_line": 10
+        }
+      ],
+      "sublabel": "Interfaces de casos de uso"
+    },
+    {
+      "id": "servicios",
+      "label": "Servicios de aplicación",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/service/UpdateUserService.java",
+          "line": 1,
+          "end_line": 74
+        }
+      ]
+    },
+    {
+      "id": "dominio",
+      "label": "Dominio",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/domain/model/UserModel.java",
+          "line": 1,
+          "end_line": 37
+        }
+      ],
+      "sublabel": "Modelo, valores y reglas"
+    },
+    {
+      "id": "out",
+      "label": "Puertos de salida",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/port/out/SaveUserPort.java",
+          "line": 1,
+          "end_line": 7
+        }
+      ],
+      "sublabel": "Persistencia y correo"
+    },
+    {
+      "id": "repo",
+      "label": "Adaptador MySQL",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    },
+    {
+      "id": "mail",
+      "label": "Adaptador JavaMail",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/email/JavaMailEmailSenderAdapter.java",
+          "line": 1,
+          "end_line": 87
+        }
+      ]
+    },
+    {
+      "id": "db",
+      "label": "MySQL",
+      "type": "database",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    },
+    {
+      "id": "smtp",
+      "label": "Servidor SMTP",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/email/JavaMailEmailSenderAdapter.java",
+          "line": 1,
+          "end_line": 87
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "actores",
+      "to": "rest",
+      "label": "HTTP"
+    },
+    {
+      "from": "actores",
+      "to": "cli",
+      "label": "consola"
+    },
+    {
+      "from": "rest",
+      "to": "in",
+      "label": "invoca"
+    },
+    {
+      "from": "cli",
+      "to": "in",
+      "label": "invoca"
+    },
+    {
+      "from": "in",
+      "to": "servicios",
+      "label": "implementado por"
+    },
+    {
+      "from": "servicios",
+      "to": "dominio",
+      "label": "construye / valida"
+    },
+    {
+      "from": "servicios",
+      "to": "out",
+      "label": "solicita"
+    },
+    {
+      "from": "out",
+      "to": "repo",
+      "label": "implementado por"
+    },
+    {
+      "from": "out",
+      "to": "mail",
+      "label": "implementado por"
+    },
+    {
+      "from": "repo",
+      "to": "db",
+      "label": "JDBC / SQL"
+    },
+    {
+      "from": "mail",
+      "to": "smtp",
+      "label": "SMTP"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Capas",
+      "items": [
+        "Entradas: REST, seguridad y consola.",
+        "Aplicación: puertos y servicios; dominio: modelo y valores.",
+        "Salidas: puertos, adaptadores JDBC y JavaMail; proveedores externos: MySQL y SMTP.",
+        "El controlador de salud y la generación JWT son infraestructura y no atraviesan todos los puertos.",
+        "La CLI se conserva en el código, pero Main inicia únicamente Spring Boot; no es una entrada activa."
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Entradas · infraestructura",
+      "wraps": [
+        "rest",
+        "cli"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Aplicación · puertos y servicios",
+      "wraps": [
+        "in",
+        "servicios",
+        "out"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Dominio",
+      "wraps": [
+        "dominio"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Salidas · infraestructura",
+      "wraps": [
+        "repo",
+        "mail"
+      ]
+    }
+  ]
+}
