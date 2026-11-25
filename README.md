@@ -14,7 +14,7 @@ Consulta el [índice de diagramas](.diagramas/arquitectura/README.md) para explo
 `pom.xml` durante el build:
 
 ```json
-{"status":"UP","name":"users-management","version":"2.2.1"}
+{"status":"UP","name":"users-management","version":"2.2.2"}
 ```
 
 Indica que la API responde; no comprueba MySQL ni el proveedor de correo.
