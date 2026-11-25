@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diagramas de gestión de usuarios</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+    body { max-width: 58rem; margin: 3rem auto; padding: 0 1.5rem; line-height: 1.55; }
+    h1 { font-size: 2rem; } h2 { margin-top: 2rem; font-size: 1.25rem; }
+    ul { padding-left: 1.25rem; } li { margin: .6rem 0; }
+    a { color: #175cd3; } @media (prefers-color-scheme: dark) { a { color: #84adff; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Diagramas de gestión de usuarios</h1>
+    <h2>Vistas generales</h2>
+    <ul>
+      <li><a href="contexto.html">Contexto general</a></li>
+      <li><a href="hexagonal.html">Arquitectura hexagonal</a></li>
+    </ul>
+    <h2>Recorridos HTTP</h2>
+    <ul>
+      <li><a href="crear.html">Crear usuario — POST /api/users</a></li>
+      <li><a href="listar.html">Listar usuarios — GET /api/users</a></li>
+      <li><a href="consultar.html">Consultar usuario — GET /api/users/{id}</a></li>
+      <li><a href="actualizar.html">Actualizar usuario — PUT /api/users/{id}</a></li>
+      <li><a href="eliminar.html">Eliminar usuario — DELETE /api/users/{id}</a></li>
+      <li><a href="login.html">Autenticar — POST /api/auth/login</a></li>
+      <li><a href="salud.html">Salud — GET /health</a></li>
+    </ul>
+    <h2>Dominio</h2>
+    <ul><li><a href="ciclo-usuario.html">Ciclo de vida de usuario</a></li></ul>
+  </main>
+</body>
+</html>
