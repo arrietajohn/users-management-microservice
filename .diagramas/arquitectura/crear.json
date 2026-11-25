@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "POST /api/users",
+    "locale": "es",
+    "output": ".diagramas/arquitectura/crear.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/arrietajohn/users-management-microservice",
+      "revision": "fb19417f94b26958f35463cc855b3f91c5bd31d0"
+    },
+    "viewBox": [
+      1085,
+      680
+    ]
+  },
+  "participants": [
+    {
+      "id": "cliente",
+      "label": "Cliente",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/UserRestController.java",
+          "line": 1,
+          "end_line": 79
+        }
+      ]
+    },
+    {
+      "id": "filtro",
+      "label": "Seguridad",
+      "type": "security",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/security/SecurityConfig.java",
+          "line": 1,
+          "end_line": 63
+        }
+      ]
+    },
+    {
+      "id": "controlador",
+      "label": "REST",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/UserRestController.java",
+          "line": 1,
+          "end_line": 79
+        }
+      ]
+    },
+    {
+      "id": "puerto",
+      "label": "Caso de uso",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/port/in/CreateUserUseCase.java",
+          "line": 1,
+          "end_line": 10
+        }
+      ]
+    },
+    {
+      "id": "servicio",
+      "label": "Servicio",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/service/CreateUserService.java",
+          "line": 1,
+          "end_line": 60
+        }
+      ]
+    },
+    {
+      "id": "notifica",
+      "label": "Notificación",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/application/service/EmailNotificationService.java",
+          "line": 1,
+          "end_line": 107
+        }
+      ]
+    },
+    {
+      "id": "email",
+      "label": "Correo SMTP",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/email/JavaMailEmailSenderAdapter.java",
+          "line": 1,
+          "end_line": 87
+        }
+      ]
+    },
+    {
+      "id": "adaptador",
+      "label": "Repo MySQL",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    },
+    {
+      "id": "db",
+      "label": "MySQL",
+      "type": "database",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/adapter/persistence/repository/UserRepositoryMySQL.java",
+          "line": 1,
+          "end_line": 169
+        }
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "from": "cliente",
+      "to": "filtro",
+      "y": 170,
+      "label": "POST /api/users"
+    },
+    {
+      "from": "filtro",
+      "to": "controlador",
+      "y": 206,
+      "label": "Si la política autoriza"
+    },
+    {
+      "from": "controlador",
+      "to": "puerto",
+      "y": 242,
+      "label": "execute"
+    },
+    {
+      "from": "puerto",
+      "to": "servicio",
+      "y": 278,
+      "label": "implementación"
+    },
+    {
+      "from": "servicio",
+      "to": "adaptador",
+      "y": 314,
+      "label": "Busca email; si existe: 409. Crea PENDING y guarda."
+    },
+    {
+      "from": "adaptador",
+      "to": "db",
+      "y": 350,
+      "label": "SQL: consulta y escritura"
+    },
+    {
+      "from": "db",
+      "to": "adaptador",
+      "y": 386,
+      "label": "resultado SQL",
+      "variant": "return"
+    },
+    {
+      "from": "adaptador",
+      "to": "servicio",
+      "y": 422,
+      "label": "modelo / resultado",
+      "variant": "return"
+    },
+    {
+      "from": "servicio",
+      "to": "notifica",
+      "y": 458,
+      "label": "programa notificación"
+    },
+    {
+      "from": "notifica",
+      "to": "email",
+      "y": 494,
+      "label": "envío SMTP asíncrono"
+    },
+    {
+      "from": "servicio",
+      "to": "controlador",
+      "y": 530,
+      "label": "resultado del caso de uso"
+    },
+    {
+      "from": "controlador",
+      "to": "cliente",
+      "y": 566,
+      "label": "201 usuario",
+      "variant": "return"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "amber",
+      "title": "Condiciones y errores",
+      "items": [
+        "Público; validación inválida: 400. Notificación asíncrona tras guardar.",
+        "El manejo REST traduce validación y excepciones; errores de persistencia producen 500."
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Participantes",
+      "items": [
+        "Seguridad HTTP → Seguridad",
+        "Controlador REST → REST",
+        "CreateUserUseCase → Caso de uso",
+        "CreateUserService → Servicio",
+        "Notificación asíncrona → Notificación",
+        "JavaMail / SMTP → Correo SMTP",
+        "UserRepositoryMySQL → Repo MySQL"
+      ]
+    }
+  ]
+}

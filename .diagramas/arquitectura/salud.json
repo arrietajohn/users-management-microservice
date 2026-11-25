@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "GET /health",
+    "locale": "es",
+    "output": ".diagramas/arquitectura/salud.html",
+    "quality_profile": "showcase",
+    "repository": {
+      "url": "https://github.com/arrietajohn/users-management-microservice",
+      "revision": "fb19417f94b26958f35463cc855b3f91c5bd31d0"
+    }
+  },
+  "participants": [
+    {
+      "id": "cliente",
+      "label": "Cliente",
+      "type": "external",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/HealthRestController.java",
+          "line": 1,
+          "end_line": 23
+        }
+      ]
+    },
+    {
+      "id": "filtro",
+      "label": "Seguridad HTTP",
+      "type": "security",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/security/SecurityConfig.java",
+          "line": 1,
+          "end_line": 63
+        }
+      ]
+    },
+    {
+      "id": "controlador",
+      "label": "HealthRestController",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/HealthRestController.java",
+          "line": 1,
+          "end_line": 23
+        }
+      ]
+    },
+    {
+      "id": "build",
+      "label": "BuildProperties",
+      "type": "backend",
+      "sources": [
+        {
+          "path": "src/main/java/com/jcaa/usersmanagement/infrastructure/entrypoint/rest/controller/HealthRestController.java",
+          "line": 1,
+          "end_line": 23
+        }
+      ]
+    }
+  ],
+  "messages": [
+    {
+      "from": "cliente",
+      "to": "filtro",
+      "y": 170,
+      "label": "GET /health"
+    },
+    {
+      "from": "filtro",
+      "to": "controlador",
+      "y": 215,
+      "label": "permitAll"
+    },
+    {
+      "from": "controlador",
+      "to": "build",
+      "y": 260,
+      "label": "nombre y versión"
+    },
+    {
+      "from": "build",
+      "to": "controlador",
+      "y": 305,
+      "label": "metadatos"
+    },
+    {
+      "from": "controlador",
+      "to": "cliente",
+      "y": 350,
+      "label": "200 UP + metadatos"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Alcance",
+      "items": [
+        "No consulta base de datos ni verifica proveedores."
+      ]
+    }
+  ]
+}
